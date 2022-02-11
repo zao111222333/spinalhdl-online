@@ -75,7 +75,7 @@ RUN chmod a+x ${SBT_HOME}/bin/*\
 USER ${USER}
 RUN cd ${WORKDIR}/SpinalTemplateSbt \
  && sbt "runMain mylib.MyTopLevelSim"
-
+RUN rm -rf /home/${USER}/.config/coursier/mirror.properties
 
 #
 # mill & SpinalHDL

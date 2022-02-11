@@ -1,0 +1,9 @@
+# docker build --network host -t zao111222333/spinalhdl-online:sbt-full -f Dockerfile-sbt-full .
+# docker push zao111222333/spinalhdl-online:sbt-full
+# docker run -it \
+#   -p 8848:8080 \
+#   zao111222333/spinalhdl-online:sbt-full
+FROM zao111222333/spinalhdl-online:sbt
+# docker cp code:/home/${USER}/.cache/coursier cache/coursier
+RUN rm -rf /home/${USER}/.cache/coursier
+COPY cache/coursier /home/${USER}/.cache/coursier
