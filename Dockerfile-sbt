@@ -1,0 +1,173 @@
+# docker build --network host -t zao111222333/spinalhdl-online:sbt -f Dockerfile-sbt .
+# docker push zao111222333/spinalhdl-online:sbt
+# docker run -it \
+#   -p 8849:8080 \
+#   zao111222333/spinalhdl-online:sbt
+FROM debian:11-slim
+
+COPY src/sources.list-bullseye /etc/apt/sources.list
+RUN cat /etc/apt/sources.list \
+ && rm -Rf /var/lib/apt/lists/* \
+ && apt-get update -y && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+    sudo \
+    git \
+    perl \
+    gcc \
+    verilator \
+    make \
+    g++ \
+    apt-utils\
+    curl\
+    ca-certificates
+
+#
+# jdk
+# https://www.oracle.com/java/technologies/downloads/#license-lightbox
+ENV JAVA_VERSION 321
+ENV JAVA_DIR     /usr/local/oracle-java-8
+ENV JAVA_HOME    ${JAVA_DIR}/jdk1.8.0_${JAVA_VERSION}
+COPY src/jdk/jdk-8u${JAVA_VERSION}-linux-x64.tar.gz /tmp/jdk-8u${JAVA_VERSION}-linux-x64.tar.gz
+RUN cd /tmp \
+ && mkdir ${JAVA_DIR} \
+ && tar xzf jdk-8u${JAVA_VERSION}-linux-x64.tar.gz -C ${JAVA_DIR} \
+ && update-alternatives --install /usr/bin/java   java     ${JAVA_HOME}/bin/java 1500 \
+ && update-alternatives --install /usr/bin/javac  javac    ${JAVA_HOME}/bin/javac 1500 \
+ && update-alternatives --install /usr/bin/javaws javaws   ${JAVA_HOME}/bin/javaws 1500
+
+#
+# scala
+# "https://downloads.typesafe.com/scala/2.11.12/scala-2.11.12.tgz"
+ENV SCALA_VERSION 2.11.12
+ENV SCALA_HOME    /usr/local/scala
+ENV PATH ${PATH}:${SCALA_HOME}/bin
+COPY src/scala/scala-${SCALA_VERSION}.tgz /tmp/scala-${SCALA_VERSION}.tgz
+RUN cd /tmp \
+ && tar xzf scala-${SCALA_VERSION}.tgz \
+ && mkdir ${SCALA_HOME} \
+ && rm /tmp/scala-${SCALA_VERSION}/bin/*.bat \
+ && mv /tmp/scala-${SCALA_VERSION}/bin /tmp/scala-${SCALA_VERSION}/lib ${SCALA_HOME}\
+ && ln -s ${SCALA_HOME}/bin/* /usr/bin/
+
+ENV USER admin
+ENV WORKDIR /DIR/
+RUN useradd -ms /bin/bash ${USER} \
+ && echo "${USER} ALL=(ALL) ALL">>/etc/sudoers\
+ && echo "export LC_ALL=C" >> /etc/profile
+COPY src/metals/mirror.properties /home/${USER}/.config/coursier/mirror.properties
+#
+# sbt
+#
+ENV SBT_VERSION  1.4.7
+ENV SBT_HOME     /usr/local/sbt
+ENV PATH ${PATH}:${SBT_HOME}/bin
+COPY src/sbt/sbt-${SBT_VERSION}.tgz /tmp/sbt-${SBT_VERSION}.tgz
+RUN cd /tmp \
+ && mkdir ${SBT_HOME} \
+ && tar -zxvf sbt-${SBT_VERSION}.tgz \
+ && mv sbt/* $SBT_HOME \
+ && ln -s ${SBT_HOME}/bin/* /usr/local/bin/
+COPY src/SpinalTemplateSbt-sbt ${WORKDIR}/SpinalTemplateSbt
+RUN chmod a+x ${SBT_HOME}/bin/*\
+ && chown -R ${USER} ${WORKDIR}\
+ && mkdir -p /home/${USER}/.cache/coursier\
+ && chown -R ${USER} /home/${USER}
+USER ${USER}
+RUN cd ${WORKDIR}/SpinalTemplateSbt \
+ && sbt "runMain mylib.MyTopLevelSim"
+
+
+#
+# mill & SpinalHDL
+#
+# ENV MILL_VERSION 0.9.8
+# COPY src/mill/${MILL_VERSION} /usr/local/bin/mill
+# COPY src/mill/${MILL_VERSION}-assembly /home/${USER}/.cache/mill/download/${MILL_VERSION}
+# COPY src/SpinalTemplateSbt-mill ${WORKDIR}/SpinalTemplateSbt
+# RUN chmod a+x /usr/local/bin/mill\
+#  && chmod a+x /home/${USER}/.cache/mill/download/${MILL_VERSION}\
+#  && chown -R ${USER} ${WORKDIR}\
+#  && mkdir -p /home/${USER}/.cache/coursier\
+#  && chown -R ${USER} /home/${USER}
+# USER ${USER}
+# RUN cd ${WORKDIR}/SpinalTemplateSbt \
+#  && mill mill.contrib.Bloop/install
+#
+# code-server
+USER root
+ENV PASSWORD 123456
+ENV CODE_VERSION  4.0.2
+COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
+RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
+COPY src/code-server/browser/media/pwa-icon-192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
+COPY src/code-server/browser/media/pwa-icon-512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
+COPY src/code-server/browser/media/pwa-icon.png             /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
+COPY src/code-server/browser/media/favicon-dark-support.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
+COPY src/code-server/browser/media/favicon.ico              /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
+COPY src/code-server/browser/media/favicon.svg              /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
+COPY src/code-server/browser/media            /usr/lib/code-server/src/browser/media
+COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
+COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css
+RUN sed -i "s/Welcome to code-server/Welcome to SpinalHDL-Online/" /usr/lib/code-server/src/browser/pages/login.html \
+ && sed -i "s/{{PASSWORD_MSG}}/{{PASSWORD_MSG}} <a href=\"https:\/\/github.com\/zao111222333\/spinalhdl-online\/\">more<\/a>/" /usr/lib/code-server/src/browser/pages/login.html
+COPY src/code-server/settings.json /home/${USER}/.local/share/code-server/User/settings.json 
+RUN chown -R ${USER} ${WORKDIR}
+RUN chown -R ${USER} /home/${USER}
+COPY src/code-server/extension /tmp/extension
+USER ${USER}
+RUN code-server --install-extension /tmp/extension/scala-lang.scala-*.vsix \
+ && code-server --install-extension /tmp/extension/scalameta.metals-*.vsix \
+ && code-server --install-extension /tmp/extension/mshr-h.VerilogHDL-*.vsix \
+ && code-server --install-extension /tmp/extension/bkromhout.vscode-tcl-*.vsix
+#  && code-server --install-extension /tmp/extension/toem-de.impulse-*.vsix
+
+
+# zsh
+COPY src/zsh/zshrc /home/${USER}/.zshrc
+COPY src/zsh/zsh.d.tar.gz /tmp/zsh.d.tar.gz
+COPY src/zsh/lscolor.sh /etc/profile.d/lscolor.sh
+USER root
+RUN cd /tmp \
+ && mkdir /home/${USER}/.zsh.d \
+ && tar -zxf /tmp/zsh.d.tar.gz \
+ && mv zsh.d/* /home/${USER}/.zsh.d \
+ && chown -R ${USER} /home/${USER} \
+ && apt-get update && apt-get -y install zsh \
+ && chmod -R 755 /home/${USER}/.zsh.d \
+ && rm -rf /home/${USER}/.bash* /home/${USER}/.profile \
+ && chsh -s /usr/bin/zsh ${USER}
+
+# ssh
+RUN apt-get update && apt-get install -y --no-install-recommends openssh-server \
+ && sed -i "s/#*UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config \
+ && sed -i "s/#*UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config
+
+# gtk3
+RUN apt-get install -y --no-install-recommends \
+    libglib2.0-0\
+    libgtk-3-0\
+    tk
+COPY --from=zao111222333/gtk3:latest /opt/gtkwave/ /opt/gtkwave/
+COPY --from=zao111222333/gtk3:latest /opt/gtk/     /opt/gtk/
+COPY --from=zao111222333/gtk3:latest /etc/gtk/     /etc/gtk/
+RUN rm -rf /usr/bin/gtk-update-icon-cache\
+ && ln -s /opt/gtkwave/bin/* /usr/bin/\
+ && rm -rf /usr/bin/gtkwave.origin
+ENV GDK_BACKEND  broadway
+ENV GDK_MAX_PORT 1
+# nginx
+RUN apt-get install -y --no-install-recommends \
+    apache2-utils\
+    nginx
+COPY src/nginx/nginx.conf /etc/nginx/nginx.conf
+RUN echo SpinalHDL-Online > /etc/motd \
+ && rm -rf /tmp/* \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean \
+ && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+ && echo Asia/Shanghai > /etc/timezone
+
+EXPOSE 8080
+# EXPOSE 22
+COPY entrypoint/docker-entrypoint-mill.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]

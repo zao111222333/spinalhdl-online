@@ -1,0 +1,62 @@
+#! /bin/bash
+# ========== get host
+i=1
+url=$(tail -n 1 /etc/nginx/access.log| head -n 1)
+while [[ $url = "-" ]]
+do
+  url=$(tail -n $i /etc/nginx/access.log| head -n 1)
+  let i+=1
+done
+index=$(echo $url | awk -F '/' '{print $1}' | wc -c)
+host=$host${url: 0:$index}
+url=${url: $index}
+index=$(echo $url | awk -F '/' '{print $1}' | wc -c)
+host=$host${url: 0:$index}
+url=${url: $index}
+index=$(echo $url | awk -F '/' '{print $1}' | wc -c)
+host=$host${url: 0:$index}
+url=${url: $index}
+echo ""
+# ========== get PORT
+LAST_PORT_FILE=$HOME/.config/GDK_LAST_PORT
+if [ ! -f "$LAST_PORT_FILE" ]; then
+  PORT=""
+else
+  PORT=$(cat $LAST_PORT_FILE)
+fi
+GDK_MIN_PORT=0
+if [[ -n $PORT ]];then
+  if [[ $PORT -ge $GDK_MAX_PORT ]]; then
+    PORT=$GDK_MIN_PORT
+  else
+    let PORT+=1
+  fi
+else
+  PORT=$GDK_MIN_PORT
+fi
+echo $PORT > $LAST_PORT_FILE
+# ========== RUN gtkwave
+filepath=${@: -1}
+SHELL_FOLDER=$(dirname $(readlink -f "$0"))
+url_text=""
+tcl_text=""
+if [ -f "$filepath" ]; then
+  OLD_IFS="$IFS"
+  IFS="/"
+  array=($filepath)
+  IFS="$OLD_IFS"
+  wavefile=${array[-1]}
+  if [ $wavefile = gtkwave ];then
+    url_text=""
+    tcl_text=""
+  else
+    url_text="?file=$wavefile"
+    tcl_text="-S $(cd $SHELL_FOLDER/.. && pwd)/gtkwave.tcl"
+  fi
+else
+  url_text=""
+  tcl_text=""
+fi
+echo -e "Open \033[47;30m${host}gtk3/$PORT/$url_text\033[0m to view."
+export BROADWAY_DISPLAY=:$PORT
+$SHELL_FOLDER/gtkwave.origin -6 $tcl_text $*

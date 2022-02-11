@@ -1,0 +1,9 @@
+# docker build --network host -t zao111222333/spinalhdl-online:mill-full -f Dockerfile-mill-full .
+# docker push zao111222333/spinalhdl-online:mill-full
+# docker run -it \
+#   -p 8848:8080 \
+#   zao111222333/spinalhdl-online:mill-full
+FROM zao111222333/spinalhdl-online:mill
+# docker cp code:/home/${USER}/.cache/coursier cache/coursier
+RUN rm -rf /home/${USER}/.cache/coursier
+COPY cache/coursier /home/${USER}/.cache/coursier

@@ -1,0 +1,16 @@
+# docker build --network host -t zao111222333/xpra-gtkwave -f Dockerfile-xpra-gtkwave .
+# docker run --privileged --rm -it -p 5000:14500 zao111222333/xpra-gtkwave bash
+# docker run --rm -it zao111222333/gtk3
+# =============== BUILD =================
+FROM ffeldhaus/docker-xpra-html5-minimal
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \
+    libglib2.0-0\
+    libgtk-3-0\
+    tk
+COPY --from=zao111222333/gtk3:latest /opt/gtkwave/ /opt/gtkwave/
+COPY --from=zao111222333/gtk3:latest /opt/gtk/     /opt/gtk/
+COPY --from=zao111222333/gtk3:latest /etc/gtk/     /etc/gtk/
+RUN rm -rf /usr/bin/gtk-update-icon-cache\
+ && ln -s /opt/gtkwave/bin/* /usr/bin/\
+ && rm -rf /usr/bin/gtkwave.origin

@@ -1,0 +1,18 @@
+{
+    // Git
+    "git.autofetch": true,
+    // ColorTheme
+    "workbench.colorTheme": "Default Dark+",
+    // Terminal
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.scrollback": 4000,
+    // BracketPairs
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs":"active",
+    "metals": {
+    //   "scalafmtConfigPath": "project/.scalafmt.conf",
+      "ammoniteJvmProperties": ["-Xmx12G","-Xss128m"],
+      "millScript": "/usr/local/bin/mill",
+      "sbtScript": "/usr/local/bin/sbt"
+    }
+}

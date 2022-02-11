@@ -1,0 +1,4 @@
+[repositories]
+  local
+  aliyun-maven-public: https://maven.aliyun.com/repository/public
+  aliyun-maven-central: https://maven.aliyun.com/repository/central

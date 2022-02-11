@@ -1,0 +1,22 @@
+# Source My Config
+export ZSH_DIR=".zsh.d"
+source $HOME/$ZSH_DIR/MyConfig.sh
+# Source global definitions
+if [ -f /etc/profile ]; then
+	. /etc/profile
+fi
+if [ -f /etc/zshrc ]; then
+	. /etc/zshrc
+fi
+
+# Lines configured by zsh-newuser-install
+HISTFILE=$HOME/$ZSH_DIR/zshistory
+HISTSIZE=1000
+SAVEHIST=1000
+bindkey -e
+# End of lines configured by zsh-newuser-install
+
+# User specific environment
+PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+export PATH
+

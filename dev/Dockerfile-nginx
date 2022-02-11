@@ -1,0 +1,26 @@
+# docker build --network host -t zao111222333/nginx -f Dockerfile-nginx .
+# docker run -it \
+#   -p 8000:80 \
+#   zao111222333/nginx
+# =============== BUILD =================
+FROM debian:11-slim as build
+COPY src/sources.list-bullseye /etc/apt/sources.list
+RUN cat /etc/apt/sources.list \
+ && rm -Rf /var/lib/apt/lists/* \
+ && apt-get update -y && apt-get upgrade -y\
+ && apt-get install -y --no-install-recommends \
+    gcc make libpcre3-dev libssl-dev zlib1g-dev libxml2-dev libxslt-dev libgd-dev libgeoip-dev
+RUN apt-get install -y --no-install-recommends \
+    unzip
+COPY src/nginx/nginx-master.zip /tmp/nginx.zip
+COPY src/nginx/nginx-dav-ext-module-master.zip /tmp/dav-ext-module.zip
+WORKDIR /tmp 
+RUN unzip nginx.zip \
+ && unzip dav-ext-module.zip
+RUN cd nginx-master \
+ && ./auto/configure \
+    --prefix=/opt/nginx\
+    --conf-path=/etc/nginx/nginx.conf\
+    --with-http_dav_module\
+    --add-module=/tmp/nginx-dav-ext-module-master \
+ && make -j8 && make install

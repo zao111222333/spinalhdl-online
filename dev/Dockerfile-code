@@ -1,0 +1,62 @@
+# docker build --network host -t zao111222333/code -f Dockerfile-code .
+# docker run -it -p 5000:8080 zao111222333/code
+FROM debian:11-slim
+
+ENV USER admin
+ENV WORKDIR /DIR/
+ENV PASSWORD 123456
+RUN useradd -ms /bin/bash ${USER} \
+ && echo "${USER} ALL=(ALL) ALL">>/etc/sudoers \
+ && echo "export COURSIER_CACHE=/usr/share/sbt/coursier" >> /etc/profile \
+ && echo "export LC_ALL=C" >> /etc/profile\
+ && mkdir -p ${WORKDIR}
+# code-server
+# 3.12.0
+ENV CODE_VERSION  3.12.0
+# ENV CODE_VERSION  4.0.0
+COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
+RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
+COPY src/code-server/browser/media           /usr/lib/code-server/src/browser/media
+COPY src/code-server/browser/pages/login.css /usr/lib/code-server/src/browser/pages/login.css
+COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css
+RUN sed -i "s/Welcome to code-server/Welcome to CODE!/" /usr/lib/code-server/src/browser/pages/login.html \
+ && sed -i "s/{{PASSWORD_MSG}}/{{PASSWORD_MSG}} <a href=\"https:\/\/github.com\/zao111222333\">more<\/a>/" /usr/lib/code-server/src/browser/pages/login.html
+COPY src/code-server/settings.json /home/${USER}/.local/share/code-server/User/settings.json 
+RUN chown -R ${USER} ${WORKDIR}
+RUN chown -R ${USER} /home/${USER}
+COPY src/code-server/extension /tmp/extension
+USER ${USER}
+# RUN for file in /tmp/extension/*.vsix;do code-server --install-extension file;done
+# RUN code-server --install-extension /tmp/extension/scala-lang.scala-*.vsix
+# RUN code-server --install-extension /tmp/extension/scalameta.metals-*.vsix
+RUN code-server --install-extension /tmp/extension/CoenraadS.bracket-pair-colorizer-*.vsix
+# RUN code-server --install-extension /tmp/extension/mshr-h.VerilogHDL-*.vsix
+# RUN code-server --install-extension /tmp/extension/wavetrace.wavetrace-*.vsix
+# RUN code-server --install-extension /tmp/extension/toem-de.impulse-*.vsix
+
+
+# zsh
+COPY src/zsh/zshrc /home/${USER}/.zshrc
+COPY src/zsh/zsh.d.tar.gz /tmp/zsh.d.tar.gz
+COPY src/zsh/lscolor.sh /etc/profile.d/lscolor.sh
+USER root
+RUN cd /tmp \
+ && mkdir /home/${USER}/.zsh.d \
+ && tar -zxf /tmp/zsh.d.tar.gz \
+ && mv zsh.d/* /home/${USER}/.zsh.d \
+ && chown -R ${USER} /home/${USER} \
+ && apt-get update && apt-get -y install zsh \
+ && chmod -R 755 /home/${USER}/.zsh.d \
+ && rm -rf /home/${USER}/.bash* /home/${USER}/.profile \
+ && chsh -s /usr/bin/zsh ${USER}
+
+USER root
+RUN rm -rf /tmp/* \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean \
+ && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+ && echo Asia/Shanghai > /etc/timezone
+
+EXPOSE 8080
+COPY docker-entrypoint-code.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]

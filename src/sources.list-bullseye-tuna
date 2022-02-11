@@ -1,0 +1,2 @@
+deb http://ftp.cn.debian.org/debian sid main 
+deb http://mirrors.163.com/debian/ bullseye main

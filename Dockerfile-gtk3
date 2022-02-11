@@ -1,0 +1,185 @@
+# docker build --network host -t zao111222333/gtk3 -f Dockerfile-gtk3 .
+# docker run --rm -it -p 5000:5000 zao111222333/gtk3
+# docker run --rm -it zao111222333/gtk3
+# =============== BUILD =================
+FROM debian:11-slim as build
+COPY src/sources.list-bullseye /etc/apt/sources.list
+RUN cat /etc/apt/sources.list \
+ && rm -Rf /var/lib/apt/lists/* \
+ && apt-get update -y && apt-get upgrade -y
+RUN apt-get install -y --no-install-recommends \
+    build-essential \
+    autoconf \
+    autotools-dev \
+    pkg-config \
+    automake \
+    tcl-dev \
+    tk-dev \
+    gperf \
+    libbz2-dev\
+    liblzma-dev\
+    libgtk-3-dev\
+    gtk-doc-tools\
+    gnome-common\
+    intltool\
+    valac\
+    libglib2.0-dev\
+    gobject-introspection\
+    libgirepository1.0-dev\
+    libclutter-gtk-1.0-dev\
+    libgnome-desktop-3-dev\
+    libcanberra-dev\
+    libgdata-dev\
+    libdbus-glib-1-dev\
+    libgstreamer1.0-dev\
+    libupower-glib-dev\
+    fonts-droid-fallback\
+    meson\
+    libatk1.0-dev\
+    cmake
+WORKDIR /Dependencies
+COPY src/gtk/Dependencies /Dependencies
+# https://www.linuxfromscratch.org/blfs/view/svn/x/atk.html
+RUN tar -xf atk-2.36.0.tar.xz\
+ && cd atk-2.36.0\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release ..\
+ && ninja\
+ && ninja install
+# https://www.linuxfromscratch.org/blfs/view/svn/general/glib2.html
+RUN tar -xf glib-2.70.2.tar.xz\
+ && cd glib-2.70.2\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release -Dman=true ..\
+ && ninja\
+ && ninja install
+# https://www.linuxfromscratch.org/blfs/view/svn/x/at-spi2-core.html
+RUN tar -xf at-spi2-core-2.40.3.tar.xz\
+ && cd at-spi2-core-2.40.3\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release ..\
+ && ninja\
+ && ninja install
+# https://www.linuxfromscratch.org/blfs/view/svn/x/at-spi2-atk.html
+RUN tar -xf at-spi2-atk-2.38.0.tar.xz\
+ && cd at-spi2-atk-2.38.0\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release ..\
+ && ninja\
+ && ninja install
+# https://www.linuxfromscratch.org/blfs/view/svn/x/gdk-pixbuf.html
+RUN tar -xf gdk-pixbuf-2.42.6.tar.xz\
+ && cd gdk-pixbuf-2.42.6\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release --wrap-mode=nofallback ..\
+ && ninja\
+ && ninja install
+# https://www.linuxfromscratch.org/blfs/view/svn/x/libepoxy.html
+RUN tar -xf libepoxy-1.5.9.tar.xz\
+ && cd libepoxy-1.5.9\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release ..\
+ && ninja\
+ && ninja install
+# https://www.linuxfromscratch.org/blfs/view/svn/x/pango.html
+RUN tar -xf pango-1.50.2.tar.xz\
+ && cd pango-1.50.2\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release --wrap-mode=nofallback ..\
+ && ninja\
+ && ninja install
+
+RUN tar -xzf tiff-4.1.0.tar.gz\
+ && cd tiff-4.1.0\
+ && ./configure\
+ && make\
+ && make install
+
+RUN tar -xzf jpegsrc.v9d.tar.gz\
+ && cd jpeg-9d\
+ && ./configure\
+ && make\
+ && make install
+
+# git clone git://github.com/ebassi/graphene
+RUN cd graphene\
+ && mkdir build && cd build\
+ && meson --prefix=/usr --buildtype=release ..\
+ && ninja\
+ && ninja install
+
+RUN apt-get install -y --no-install-recommends \
+    sassc\
+    libgstreamer-plugins-bad1.0-dev
+RUN tar -xzf meson-0.60.2.tar.gz
+
+WORKDIR /
+COPY src/gtk/gtk+-3.24.30.tar.xz /gtk+-3.24.30
+RUN tar -xf gtk+-3.24.30
+COPY src/gtk/gtkwave-online/gtk+-3.24.30 /gtk+-3.24.30
+RUN cd gtk+-3.24.30\
+ && ./autogen.sh\
+ && ./configure --prefix=/opt/gtk/     \
+            --sysconfdir=/etc/gtk/     \
+            --enable-broadway-backend  \
+ && make -j8\
+ && make install
+
+# WORKDIR /
+# COPY src/gtk/gtk+-3.24.30.tar.xz /gtk+-3.24.30
+# RUN tar -xf gtk+-3.24.30
+# COPY src/gtk/gtkwave-online/gtk+-3.24.30 /gtk+-3.24.30
+# RUN cd gtk+-3.24.30\
+#  && mkdir build && cd build\
+#  && /Dependencies/meson-0.60.2/meson.py\
+#         --sysconfdir=/etc/gtk/     \
+#         --prefix=/opt/gtk/ ..\
+#  && ninja\
+#  && ninja install
+
+WORKDIR /
+
+COPY src/gtk/gtkwave3-gtk3 /gtkwave3-gtk3
+COPY src/gtk/gtkwave-online/gtkwave3-gtk3 /gtkwave3-gtk3
+RUN cd gtkwave3-gtk3\
+ && chmod a+x ./autogen.sh\
+ && ./autogen.sh\
+ && ./configure --prefix=/opt/gtkwave/ \
+                --enable-gtk3 \
+ && make -j8 \
+ && make install
+RUN mv /opt/gtkwave/bin/gtkwave /opt/gtkwave/bin/gtkwave.origin
+COPY src/gtk/gtkwave      /opt/gtkwave/bin/gtkwave
+COPY src/gtk/gtkwave.tcl  /opt/gtkwave/gtkwave.tcl
+COPY src/gtk/AxiRegTC.vcd /opt/gtkwave/AxiRegTC.vcd
+# =============== RUN =================
+FROM debian:11-slim
+COPY src/sources.list-bullseye /etc/apt/sources.list
+RUN cat /etc/apt/sources.list \
+ && rm -Rf /var/lib/apt/lists/* \
+ && apt-get update -y && apt-get upgrade -y\
+ && apt-get install -y --no-install-recommends \
+    libglib2.0-0\
+    libgtk-3-0\
+    tk
+COPY --from=build /opt/gtkwave/ /opt/gtkwave/
+COPY --from=build /opt/gtk/     /opt/gtk/
+COPY --from=build /etc/gtk/     /etc/gtk/
+RUN rm -rf /usr/bin/gtk-update-icon-cache\
+ && ln -s /opt/gtkwave/bin/* /usr/bin/\
+ && rm -rf /usr/bin/gtkwave.origin
+ENV GDK_BACKEND broadway
+EXPOSE 5000
+
+# FOR DEBUG
+RUN apt-get install -y --no-install-recommends \
+    gdb\
+    systemd-coredump\
+    procps
+# FOR DEBUG
+RUN rm -rf /tmp/* \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean
+
+COPY entrypoint/docker-entrypoint-gtk3-debug.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
