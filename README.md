@@ -131,3 +131,6 @@ docker build --network host -t zao111222333/spinalhdl-online:mill -f Dockerfile-
 # Step 3, mill way
 docker build --network host -t zao111222333/spinalhdl-online:mill-full -f Dockerfile-mill-full .
 ```
+## TODO List
+- [x] Gtkwave-Online
+- [ ] Webdav
