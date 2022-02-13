@@ -612,6 +612,7 @@ function handleCommands(cmd)
 	switch (command) {
 	case 'D':
 	    // alert ("disconnected");
+        location.reload();
 	    inputSocket = null;
 	    break;
 
@@ -2726,18 +2727,19 @@ function gtkwave_online()
 {
     document.title = location.search.split('file=')[1]+" - Gtkwave Online"
     document.body.style.background = "#202124";
-    const changeFavicon = link => {
+    const changeFavicon = icon => {
         let $favicon = document.querySelector('link[rel="icon"]');
         if ($favicon !== null) {
-            $favicon.href = link;
+            $favicon.href = icon
         } else {
             $favicon = document.createElement("link");
             $favicon.rel = "icon";
-            $favicon.href = link;
+            $favicon.href = icon
             document.head.appendChild($favicon);
         }
     };
-    changeFavicon("https://junzhuo.me/icon/favicon-gtkwave.ico");
+    let icon = "data:image/png;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAACJ2LD/e8Ge/3zHof99yaL/fcSg/37Hov9/zqb/fsai/3/Hov+B0Kj/gMqk/4DHo/+Bzab/gcum/3/Gov+O3bX/XpV5/xc0Jf8hYkH/HE41/xAYFP8UKB7/HE81/xEcFv8RHBb/HU81/xQoHv8QGBT/HU82/yFiQf8YNCb/YZh8/1eKcP8WXTn/KLBr/yCOVv8BAwL/Aw8J/w07JP8AAQH/AAEB/w06I/8DDwn/AQQC/yCOVv8osGv/Fl05/1qNc/9al3j/CicZ/xFMLv8mo2T/CzIe/woqGf8RSi3/CCEU/wghFP8RSi3/CioZ/wwyH/8mo2T/EUsu/wonGf9dmnv/XaiC/xNLL/8UVjT/JJ1g/xpyRv8STi//Fl86/xFLLv8RSy7/Fl86/xJNL/8ac0b/JJ1g/xRWNP8TSy//YKuF/1eMcf8CAwP/CSUX/xpwRP8VXDj/Aw4J/w48Jf8BAwL/AQMC/w48Jf8DDgn/FV05/xpwRP8IJRf/AgMD/1qOdP9Xi3D/AgEB/wklF/8STS//G3ZI/wQTC/8OOyT/AAEB/wABAf8NOyT/BBML/xt2SP8RTC//CCUX/wIBAf9ajXP/W6B9/w43Iv8RSi3/FFU0/yOWXP8RSy7/E1Qz/ww2If8MNiH/E1Qz/xFLLv8jllz/FFU0/xFKLf8ONyL/XqOA/1ugfv8OOSP/EUwu/xFLLv8fiVT/GGhA/xNTM/8NOCL/DTkj/xNTM/8YaED/H4hT/xFLLv8RTC7/Djkk/16jgP9XinD/AQEB/wknGP8IJBb/Ek4v/xdlPv8NOCL/AAEB/wABAf8NNyL/F2U+/xJNL/8IJBb/CScY/wIBAf9ZjXP/V4tx/wIDAv8JKBn/CSYX/worGv8ehFH/Dj0l/wEDAv8BAwL/Dj0l/x6EUf8KKxr/CSYX/wkoGf8CAwL/WY5z/12ngv8SSy7/FFc1/xRWNf8UVTT/JqZl/xhnP/8RSSz/EUks/xhnP/8mpWX/FFU0/xRXNf8UVzX/Eksu/1+qhP9amHj/CSMW/w49Jf8OPSX/ByAU/yCLVf8acUX/Ciwb/wosG/8ackX/IItV/wcgFP8OPSX/Dj0l/wkjFv9bmnr/Vopw/wIBAf8JJxj/CScY/wAAAP8UVzX/Krlw/yObX/8jm1//Krlx/xRWNf8AAAD/CScY/wknGP8CAQH/WIxy/1yTd/8QGBT/Fzso/xc7Kf8OFBH/FDAi/yJtR/8aRzD/Gkcw/yJtR/8UMCL/DhQR/xc7Kf8XOyn/EBkU/16Vef+F1a3/d76a/3jFnv95xZ7/eL+b/3jBnP96x6D/eL2a/3i9mv96yKH/ecKd/3nAnP96x6D/eseg/3nAnP+I2LD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+    changeFavicon(icon);
 }
 
 function connect()
@@ -2768,7 +2770,8 @@ function connect()
     ws.onclose = function() {
 	if (inputSocket != null)
 	    // alert ("disconnected");
-	inputSocket = null;
+        location.reload();
+	    inputSocket = null;
     };
     ws.onmessage = function(event) {
 	handleMessage(event.data);
