@@ -9,7 +9,8 @@ Blog: <a href="https://junzhuo.me/Blogs/SpinalHDL-Online/" target="_blank">https
 
 Demo: <a href="https://spinalhdl-online.junzhuo.me" target="_blank">https://spinalhdl-online.junzhuo.me</a> with `PASSWORD=123456`.
 
-<img width="1076" alt="SpinalHDL-Online-Demo" src="https://junzhuo.me/images/Blogs/SpinalHDL-Online/SpinalHDL-Online-Demo.png">
+![image](https://user-images.githubusercontent.com/57790433/153767207-a1ebb28a-8d51-4234-a199-7d41e50a954b.png)
+
 
 Run these two lines in TERMINAL: 
 ```shell
