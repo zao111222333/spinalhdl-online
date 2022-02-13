@@ -2,8 +2,11 @@
 FIRST_BOOT() {
 if [ ${WORKDIR} != /DIR ] && [ ${WORKDIR} != /DIR/ ]
 then
-    rm -rf /DIR
-    mkdir -p ${WORKDIR}
+    if [ "$(ls -A $WORKDIR)" = "" ]
+    then 
+        mv /DIR ${WORKDIR}
+    else
+    fi
 fi
 if [ ${USER} != admin ]
 then
@@ -15,8 +18,8 @@ then
     userdel admin
 fi
 echo "${USER}:${PASSWORD}" | chpasswd
-echo "if [ \"\$(ls -A \$WORKDIR)\" = \"\" ]; then cd $WORKDIR && git clone https://github.com/SpinalHDL/SpinalTemplateSbt.git ; fi">>/home/${USER}/.zshrc
-echo "git config --global http.sslVerify false">>/home/${USER}/.zshrc
+# echo "if [ \"\$(ls -A \$WORKDIR)\" = \"\" ]; then cd $WORKDIR && git clone https://github.com/SpinalHDL/SpinalTemplateSbt.git ; fi">>/home/${USER}/.zshrc
+# echo "git config --global http.sslVerify false">>/home/${USER}/.zshrc
 
 mkdir /run/sshd \
 && rm -f /etc/ssh/ssh_*_key \
