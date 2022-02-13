@@ -1,20 +1,19 @@
-# docker-compose up -d --remove-orphans --force-recreate
+# docker-compose up --remove-orphans --force-recreate
 version: '3'
 
 services:
   app:
-    image: zao111222333/spinalhdl-online:mill-full
+    image: zao111222333/spinalhdl-online
     container_name: spinalhdl-online
     restart: always
     environment:
       - USER=username
       - PASSWORD=123456
       - WORKDIR=/SpinalHDL
+      - GDK_MAX_PORT=2
     volumes:
       - ~/SpinalHDL-Share:/SpinalHDL
       - ~/KEY:/KEY
-    networks:
-      - web-net
     ports:
       - 8848:8080
       - 2222:22
