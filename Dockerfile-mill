@@ -132,7 +132,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssh-server 
  && sed -i "s/#*UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config \
  && sed -i "s/#*UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config
 
-# gtk3
+# gtkwave-online
 RUN apt-get install -y --no-install-recommends \
     libglib2.0-0\
     libgtk-3-0\
