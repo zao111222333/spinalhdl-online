@@ -123,21 +123,18 @@ RUN code-server --install-extension /tmp/extension/scala-lang.scala-*.vsix \
 
 
 # zsh
-COPY src/zsh/zshrc /home/${USER}/.zshrc
-COPY src/zsh/zsh.d.tar.gz /tmp/zsh.d.tar.gz
-COPY src/zsh/lscolor.sh /etc/profile.d/lscolor.sh
+COPY src/zsh /tmp/zsh
 USER root
-RUN cd /tmp \
- && mkdir /home/${USER}/.zsh.d \
- && tar -zxf /tmp/zsh.d.tar.gz \
- && mv zsh.d/* /home/${USER}/.zsh.d \
- && chown -R ${USER} /home/${USER} \
+RUN chown -R ${USER} /home/${USER} \
  && apt-get update && apt-get -y install zsh \
- && chmod -R 755 /home/${USER}/.zsh.d \
  && rm -rf /home/${USER}/.bash* /home/${USER}/.profile \
- && chsh -s /usr/bin/zsh ${USER}
-
+ && chsh -s /usr/bin/zsh ${USER} \
+ && touch /etc/profile.d/null.sh
+USER ${USER}
+RUN cd /tmp/zsh \
+ && ./install.sh
 # ssh
+USER root
 RUN apt-get update && apt-get install -y --no-install-recommends openssh-server \
  && sed -i "s/#*UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config \
  && sed -i "s/#*UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config
@@ -168,6 +165,6 @@ RUN echo SpinalHDL-Online > /etc/motd \
  && echo Asia/Shanghai > /etc/timezone
 
 EXPOSE 8080
-# EXPOSE 22
+EXPOSE 22
 COPY entrypoint/docker-entrypoint-mill.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]

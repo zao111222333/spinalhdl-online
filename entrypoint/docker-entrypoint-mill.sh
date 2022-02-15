@@ -43,6 +43,8 @@ do
     echo "proxy_pass http://127.0.0.1:$port/;">>/etc/nginx/gtk3.conf
     echo "}">>/etc/nginx/gtk3.conf
 done
+
+echo "${USER} ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
 }
 
 BOOT() {
@@ -52,8 +54,9 @@ do
     su ${USER} --command "/opt/gtk/bin/broadwayd -p $port :$i"&
 done
 nginx
-su ${USER} --command "code-server --bind-addr 127.0.0.1:7000 ${WORKDIR}"
+su ${USER} --command "code-server --bind-addr 127.0.0.1:7000 --proxy-domain localhost:8848 ${WORKDIR}"
 }
+# code-server --host 0.0.0.0 --port $UID --proxy-domain $UID.domain.tld
 
 if [ ! -f /DOCKER_BOOT_LOCK ];then
     echo "FIRST BOOT"
