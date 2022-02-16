@@ -4,6 +4,6 @@
 #   -p 8849:8080 \
 #   zao111222333/spinalhdl-online:sbt-full
 FROM zao111222333/spinalhdl-online:sbt
-# docker cp code:/home/${USER}/.cache/coursier cache/coursier
+# docker cp code:/home/${USER}/.cache/coursier cache/sbt
 RUN rm -rf /home/${USER}/.cache/coursier
-COPY cache/coursier /home/${USER}/.cache/coursier
+COPY cache/sbt /home/${USER}/.cache/coursier

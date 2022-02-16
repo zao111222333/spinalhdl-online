@@ -4,6 +4,6 @@
 #   -p 8848:8080 \
 #   zao111222333/spinalhdl-online:mill-full
 FROM zao111222333/spinalhdl-online:mill
-# docker cp code:/home/${USER}/.cache/coursier cache/coursier
+# docker cp code:/home/${USER}/.cache/coursier cache/mill
 RUN rm -rf /home/${USER}/.cache/coursier
-COPY cache/coursier /home/${USER}/.cache/coursier
+COPY cache/mill /home/${USER}/.cache/coursier

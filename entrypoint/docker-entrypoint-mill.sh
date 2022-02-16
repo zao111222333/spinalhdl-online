@@ -15,6 +15,8 @@ then
     rm -rf /home/${USER}
     mv /home/admin /home/${USER}
     userdel admin
+    rm /home/${USER}/.zinit
+    ln -s /home/${USER}/.zsh.d/zinit /home/${USER}/.zinit
 fi
 echo "${USER}:${PASSWORD}" | chpasswd
 # echo "if [ \"\$(ls -A \$WORKDIR)\" = \"\" ]; then cd $WORKDIR && git clone https://github.com/SpinalHDL/SpinalTemplateSbt.git ; fi">>/home/${USER}/.zshrc
