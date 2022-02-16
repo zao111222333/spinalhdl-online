@@ -14,7 +14,6 @@ then
     cd /home
     rm -rf /home/${USER}
     mv /home/admin /home/${USER}
-    echo "${USER} ALL=(ALL) ALL">>/etc/sudoers
     userdel admin
 fi
 echo "${USER}:${PASSWORD}" | chpasswd

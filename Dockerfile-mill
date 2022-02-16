@@ -49,25 +49,19 @@ RUN cd /tmp \
  && mv /tmp/scala-${SCALA_VERSION}/bin /tmp/scala-${SCALA_VERSION}/lib ${SCALA_HOME}\
  && ln -s ${SCALA_HOME}/bin/* /usr/bin/
 
-#
-# sbt
-#
-# ENV SBT_VERSION  1.4.7
-# ENV SBT_HOME     /usr/local/sbt
-# ENV PATH ${PATH}:${SBT_HOME}/bin
-# COPY src/sbt/sbt-${SBT_VERSION}.tgz /tmp/sbt-${SBT_VERSION}.tgz
-# RUN cd /tmp \
-#  && mkdir ${SBT_HOME} \
-#  && tar -zxvf sbt-${SBT_VERSION}.tgz \
-#  && mv sbt/* $SBT_HOME \
-#  && ln -s ${SBT_HOME}/bin/* /usr/bin/
-
-
+# zsh & user
 ENV USER admin
 ENV WORKDIR /DIR/
-RUN useradd -ms /bin/bash ${USER} \
- && echo "${USER} ALL=(ALL) ALL">>/etc/sudoers\
- && echo "export LC_ALL=C" >> /etc/profile
+COPY src/zsh /tmp/zsh
+RUN apt-get update && apt-get -y install zsh \
+ && useradd -ms /bin/zsh ${USER} \
+ && echo "export LC_ALL=C" >> /etc/profile \
+#  && rm -rf /home/${USER}/.bash* /home/${USER}/.profile \
+ && touch /etc/profile.d/null.sh
+USER ${USER}
+RUN cd /tmp/zsh \
+ && ./install.sh
+USER root
 #
 # mill & SpinalHDL
 #
@@ -85,9 +79,34 @@ USER ${USER}
 RUN cd ${WORKDIR}/SpinalTemplateSbt \
  && mill mill.contrib.Bloop/install\
  && mill mylib.runMain mylib.MyTopLevelSim
+USER root
+
+#
+# sbt
+#
+# ENV SBT_VERSION  1.4.7
+# ENV SBT_HOME     /usr/local/sbt
+# ENV PATH ${PATH}:${SBT_HOME}/bin
+# COPY src/sbt/sbt-${SBT_VERSION}.tgz /tmp/sbt-${SBT_VERSION}.tgz
+# RUN cd /tmp \
+#  && mkdir ${SBT_HOME} \
+#  && tar -zxvf sbt-${SBT_VERSION}.tgz \
+#  && mv sbt/* $SBT_HOME \
+#  && ln -s ${SBT_HOME}/bin/* /usr/local/bin/
+# COPY src/SpinalTemplateSbt-sbt ${WORKDIR}/SpinalTemplateSbt
+# COPY src/metals/mirror.properties /home/${USER}/.config/coursier/mirror.properties
+# RUN chmod a+x ${SBT_HOME}/bin/*\
+#  && chown -R ${USER} ${WORKDIR}\
+#  && mkdir -p /home/${USER}/.cache/coursier\
+#  && chown -R ${USER} /home/${USER}
+# USER ${USER}
+# RUN cd ${WORKDIR}/SpinalTemplateSbt \
+#  && sbt "runMain mylib.MyTopLevelSim"
+# RUN rm -rf /home/${USER}/.config/coursier/mirror.properties
+# USER root
+
 #
 # code-server
-USER root
 ENV PASSWORD 123456
 ENV CODE_VERSION  4.0.2
 COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
@@ -113,21 +132,9 @@ RUN code-server --install-extension /tmp/extension/scala-lang.scala-*.vsix \
  && code-server --install-extension /tmp/extension/mshr-h.VerilogHDL-*.vsix \
  && code-server --install-extension /tmp/extension/bkromhout.vscode-tcl-*.vsix
 #  && code-server --install-extension /tmp/extension/toem-de.impulse-*.vsix
-
-
-# zsh
-COPY src/zsh /tmp/zsh
 USER root
-RUN chown -R ${USER} /home/${USER} \
- && apt-get update && apt-get -y install zsh \
- && rm -rf /home/${USER}/.bash* /home/${USER}/.profile \
- && chsh -s /usr/bin/zsh ${USER} \
- && touch /etc/profile.d/null.sh
-USER ${USER}
-RUN cd /tmp/zsh \
- && ./install.sh
+
 # ssh
-USER root
 RUN apt-get update && apt-get install -y --no-install-recommends openssh-server \
  && sed -i "s/#*UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config \
  && sed -i "s/#*UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config
