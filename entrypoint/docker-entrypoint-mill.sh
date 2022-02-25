@@ -55,7 +55,7 @@ do
     su ${USER} --command "/opt/gtk/bin/broadwayd -p $port :$i"&
 done
 nginx
-su ${USER} --command "code-server --bind-addr 127.0.0.1:7000 --proxy-domain localhost:8848 ${WORKDIR}"
+su ${USER} --command "code-server --bind-addr 127.0.0.1:7000 ${WORKDIR}"
 }
 # code-server --host 0.0.0.0 --port $UID --proxy-domain $UID.domain.tld
 

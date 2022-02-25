@@ -1,0 +1,70 @@
+# docker build --network host -t zao111222333/rust-online:latest -f Dockerfile-rust .
+# docker push zao111222333/rust-online:latest
+# docker run -it \
+#   -p 8080:8080 \
+#   zao111222333/rust-online:latest
+FROM debian:11-slim
+COPY src/sources.list-bullseye /etc/apt/sources.list
+RUN cat /etc/apt/sources.list \
+ && rm -Rf /var/lib/apt/lists/* \
+ && apt-get update -y && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+    git  \
+    perl \
+    gcc  \
+    make \
+    g++  \
+    zsh  \
+    curl \
+    ca-certificates
+# rust
+RUN cd /tmp && curl -o rustup-init.sh --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf && sh rustup-init.sh -y\
+ && mv /root/.cargo/bin/* /usr/bin/\
+ && rm -rf /root/.cargo
+
+# zsh & user
+ENV WORKDIR /DIR/
+ENV PASSWORD 123456
+RUN mkdir ${WORKDIR}
+COPY src/zsh /tmp/zsh
+RUN chsh -s /bin/zsh\
+ && echo "export LC_ALL=C" >> /etc/profile \
+ && touch /etc/profile.d/null.sh \
+ && cd /tmp/zsh \
+ && ./install.sh\
+ && ln -s /root/.zsh.d/zinit /root/.zinit
+
+#
+# code-server
+
+ENV CODE_VERSION  4.0.2
+COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
+RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
+COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
+COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css
+COPY src/code-server/settings.json /root/.local/share/code-server/User/settings.json 
+
+COPY src/code-server/extension /tmp/extension
+RUN code-server --install-extension /tmp/extension/rust-lang.rust-*.vsix
+RUN rustup component add rust-analysis --toolchain stable-x86_64-unknown-linux-gnu \
+ && rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu \
+ && rustup component add rls --toolchain stable-x86_64-unknown-linux-gnu
+
+RUN rm -rf /tmp/* \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean \
+ && chown -R root /root\
+ && rm -rf /root/.zshenv /root/.bashrc /root/.profile /root/.zcompdump\
+ && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+ && echo Asia/Shanghai > /etc/timezone
+
+EXPOSE 8080
+COPY entrypoint/docker-entrypoint-rust.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+COPY src/code-server/icon/rust-icon/192.png  /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
+COPY src/code-server/icon/rust-icon/512.png  /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
+COPY src/code-server/icon/rust-icon/1024.png /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
+COPY src/code-server/icon/rust-icon/rust.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
+COPY src/code-server/icon/rust-icon/rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
+COPY src/code-server/icon/rust-icon/rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
