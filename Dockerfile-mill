@@ -111,12 +111,12 @@ ENV PASSWORD 123456
 ENV CODE_VERSION  4.0.2
 COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
 RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
-COPY src/code-server/browser/media/pwa-icon-192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
-COPY src/code-server/browser/media/pwa-icon-512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
-COPY src/code-server/browser/media/pwa-icon.png             /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
-COPY src/code-server/browser/media/favicon-dark-support.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
-COPY src/code-server/browser/media/favicon.ico              /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
-COPY src/code-server/browser/media/favicon.svg              /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
+COPY src/icon/vscode-SpinalHDL/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
+COPY src/icon/vscode-SpinalHDL/512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
+COPY src/icon/vscode-SpinalHDL/1024.png        /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
+COPY src/icon/vscode-SpinalHDL/vscode-rust.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
+COPY src/icon/vscode-SpinalHDL/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
+COPY src/icon/vscode-SpinalHDL/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
 COPY src/code-server/browser/media            /usr/lib/code-server/src/browser/media
 COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
 COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css

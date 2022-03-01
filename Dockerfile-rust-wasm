@@ -1,0 +1,26 @@
+# docker build --network host -t zao111222333/rust-online:wasm -f Dockerfile-rust-wasm .
+# docker push zao111222333/rust-online:wasm
+# docker run -it \
+#   -p 8080:80 \
+#   zao111222333/rust-online:wasm
+FROM zao111222333/rust-online:latest
+RUN apt-get update -y && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+    npm\
+    pkg-config\
+    libudev-dev\
+    nginx
+
+RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh \
+ && cargo install cargo-generate\
+ && npm config set registry https://registry.npm.taobao.org\
+ && npm install npm@latest -g\
+ && npm install create-wasm-app -g
+
+COPY src/nginx/nginx.conf-rust-wasm /etc/nginx/nginx.conf
+COPY entrypoint/docker-entrypoint-rust-wasm.sh /docker-entrypoint.sh
+RUN rm -rf /tmp/* \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean
+
+ENV PROXY_PORT_NUMBER 2

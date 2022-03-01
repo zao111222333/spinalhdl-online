@@ -1,7 +1,7 @@
 # docker build --network host -t zao111222333/rust-online:latest -f Dockerfile-rust .
 # docker push zao111222333/rust-online:latest
 # docker run -it \
-#   -p 8080:8080 \
+#   -p 8080:80 \
 #   zao111222333/rust-online:latest
 FROM debian:11-slim
 COPY src/sources.list-bullseye /etc/apt/sources.list
@@ -58,13 +58,13 @@ RUN rm -rf /tmp/* \
  && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
  && echo Asia/Shanghai > /etc/timezone
 
-EXPOSE 8080
+EXPOSE 80
 COPY entrypoint/docker-entrypoint-rust.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-COPY src/code-server/icon/rust-icon/192.png  /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
-COPY src/code-server/icon/rust-icon/512.png  /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
-COPY src/code-server/icon/rust-icon/1024.png /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
-COPY src/code-server/icon/rust-icon/rust.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
-COPY src/code-server/icon/rust-icon/rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
-COPY src/code-server/icon/rust-icon/rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
+COPY src/icon/vscode-rust/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
+COPY src/icon/vscode-rust/512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
+COPY src/icon/vscode-rust/1024.png        /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
+COPY src/icon/vscode-rust/vscode-rust.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
+COPY src/icon/vscode-rust/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
+COPY src/icon/vscode-rust/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
