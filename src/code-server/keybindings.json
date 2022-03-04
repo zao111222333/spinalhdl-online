@@ -1,0 +1,18 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "alt+cmd+o",
+        "command": "workbench.action.files.openFolder",
+        "when": "isMac",
+    },
+    {
+        "key": "alt+win+o",
+        "command": "workbench.action.files.openFolder",
+        "when": "isWindows",
+    },
+    {
+        "key": "alt+meta+o",
+        "command": "workbench.action.files.openFolder",
+        "when": "isLinux",
+    },
+]

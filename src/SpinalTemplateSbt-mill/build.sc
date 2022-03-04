@@ -2,7 +2,7 @@ import mill._, scalalib._
 import coursier.maven.MavenRepository
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 
-val spinalVersion = "1.6.1"
+val spinalVersion = "1.6.4"
 
 object mylib extends SbtModule {
   def scalaVersion = "2.12.14"

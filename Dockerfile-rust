@@ -1,8 +1,8 @@
-# docker build --network host -t zao111222333/rust-online:latest -f Dockerfile-rust .
-# docker push zao111222333/rust-online:latest
+# docker build --network host -t zao111222333/rust-online:basic -f Dockerfile-rust .
+# docker push zao111222333/rust-online:basic
 # docker run -it \
 #   -p 8080:80 \
-#   zao111222333/rust-online:latest
+#   zao111222333/rust-online:basic
 FROM debian:11-slim
 COPY src/sources.list-bullseye /etc/apt/sources.list
 RUN cat /etc/apt/sources.list \
@@ -36,16 +36,23 @@ RUN chsh -s /bin/zsh\
 
 #
 # code-server
-
 ENV CODE_VERSION  4.0.2
 COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
 RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
 COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
 COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css
-COPY src/code-server/settings.json /root/.local/share/code-server/User/settings.json 
+COPY src/icon/vscode-rust/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
+COPY src/icon/vscode-rust/512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
+COPY src/icon/vscode-rust/1024.png        /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
+COPY src/icon/vscode-rust/vscode-rust.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
+COPY src/icon/vscode-rust/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
+COPY src/icon/vscode-rust/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
+COPY src/code-server/settings.json    /root/.local/share/code-server/User/settings.json 
+COPY src/code-server/keybindings.json /root/.local/share/code-server/User/keybindings.json
 
 COPY src/code-server/extension /tmp/extension
-RUN code-server --install-extension /tmp/extension/rust-lang.rust-*.vsix
+RUN code-server --install-extension /tmp/extension/rust-lang.rust-*.vsix\
+ && code-server --install-extension /tmp/extension/tamasfe.even-better-toml-*.vsix
 RUN rustup component add rust-analysis --toolchain stable-x86_64-unknown-linux-gnu \
  && rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu \
  && rustup component add rls --toolchain stable-x86_64-unknown-linux-gnu
@@ -61,10 +68,3 @@ RUN rm -rf /tmp/* \
 EXPOSE 80
 COPY entrypoint/docker-entrypoint-rust.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
-
-COPY src/icon/vscode-rust/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
-COPY src/icon/vscode-rust/512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
-COPY src/icon/vscode-rust/1024.png        /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
-COPY src/icon/vscode-rust/vscode-rust.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
-COPY src/icon/vscode-rust/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
-COPY src/icon/vscode-rust/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg

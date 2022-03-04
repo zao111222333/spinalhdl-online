@@ -84,7 +84,7 @@ USER root
 #
 # sbt
 #
-ENV SBT_VERSION  1.4.7
+ENV SBT_VERSION  1.6.2
 ENV SBT_HOME     /usr/local/sbt
 ENV PATH ${PATH}:${SBT_HOME}/bin
 COPY src/sbt/sbt-${SBT_VERSION}.tgz /tmp/sbt-${SBT_VERSION}.tgz
@@ -114,15 +114,16 @@ RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
 COPY src/icon/vscode-SpinalHDL/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
 COPY src/icon/vscode-SpinalHDL/512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
 COPY src/icon/vscode-SpinalHDL/1024.png        /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
-COPY src/icon/vscode-SpinalHDL/vscode-rust.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
-COPY src/icon/vscode-SpinalHDL/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
-COPY src/icon/vscode-SpinalHDL/vscode-rust.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
+COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
+COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
+COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
 COPY src/code-server/browser/media            /usr/lib/code-server/src/browser/media
 COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
 COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css
 RUN sed -i "s/Welcome to code-server/Welcome to SpinalHDL-Online/" /usr/lib/code-server/src/browser/pages/login.html \
  && sed -i "s/{{PASSWORD_MSG}}/{{PASSWORD_MSG}} <a href=\"https:\/\/github.com\/zao111222333\/spinalhdl-online\/\">more<\/a>/" /usr/lib/code-server/src/browser/pages/login.html
-COPY src/code-server/settings.json /home/${USER}/.local/share/code-server/User/settings.json 
+COPY src/code-server/settings.json    /home/${USER}/.local/share/code-server/User/settings.json 
+COPY src/code-server/keybindings.json /home/${USER}/.local/share/code-server/User/keybindings.json
 RUN chown -R ${USER} ${WORKDIR}
 RUN chown -R ${USER} /home/${USER}
 COPY src/code-server/extension /tmp/extension
