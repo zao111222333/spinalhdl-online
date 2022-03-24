@@ -16,6 +16,7 @@ RUN cat /etc/apt/sources.list \
     g++  \
     zsh  \
     curl \
+    ssh  \
     ca-certificates
 # rust
 RUN cd /tmp && curl -o rustup-init.sh --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf && sh rustup-init.sh -y\
@@ -36,7 +37,7 @@ RUN chsh -s /bin/zsh\
 
 #
 # code-server
-ENV CODE_VERSION  4.0.2
+ENV CODE_VERSION  4.2.0
 COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
 RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
 COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
@@ -52,7 +53,8 @@ COPY src/code-server/keybindings.json /root/.local/share/code-server/User/keybin
 
 COPY src/code-server/extension /tmp/extension
 RUN code-server --install-extension /tmp/extension/rust-lang.rust-*.vsix\
- && code-server --install-extension /tmp/extension/tamasfe.even-better-toml-*.vsix
+ && code-server --install-extension /tmp/extension/tamasfe.even-better-toml-*.vsix\
+ && code-server --install-extension /tmp/extension/a5huynh.vscode-ron-*.vsix
 RUN rustup component add rust-analysis --toolchain stable-x86_64-unknown-linux-gnu \
  && rustup component add rust-src --toolchain stable-x86_64-unknown-linux-gnu \
  && rustup component add rls --toolchain stable-x86_64-unknown-linux-gnu
