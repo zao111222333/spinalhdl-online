@@ -93,14 +93,14 @@ RUN cd /tmp \
  && tar -zxvf sbt-${SBT_VERSION}.tgz \
  && mv sbt/* $SBT_HOME \
  && ln -s ${SBT_HOME}/bin/* /usr/local/bin/
-COPY src/SpinalTemplateSbt-sbt ${WORKDIR}/SpinalTemplateSbt
+COPY src/SpinalTemplateSbt ${WORKDIR}/SpinalTemplate
 COPY src/metals/mirror.properties /home/${USER}/.config/coursier/mirror.properties
 RUN chmod a+x ${SBT_HOME}/bin/*\
  && chown -R ${USER} ${WORKDIR}\
  && mkdir -p /home/${USER}/.cache/coursier\
  && chown -R ${USER} /home/${USER}
 USER ${USER}
-RUN cd ${WORKDIR}/SpinalTemplateSbt \
+RUN cd ${WORKDIR}/SpinalTemplate \
  && sbt "runMain mylib.MyTopLevelSim"
 RUN rm -rf /home/${USER}/.config/coursier/mirror.properties
 USER root

@@ -1,6 +1,6 @@
 src/gtk/gtk+-3.24.30
 src/gtk/gtk4
-src/gtk/gtkwave3-gtk3
+# src/gtk/gtkwave3-gtk3
 
 src/jdk/*.tar.gz
 src/code-server/*.deb
