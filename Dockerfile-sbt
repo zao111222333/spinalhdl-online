@@ -108,7 +108,7 @@ USER root
 #
 # code-server
 ENV PASSWORD 123456
-ENV CODE_VERSION  4.0.2
+ENV CODE_VERSION  4.2.0
 COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
 RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
 COPY src/icon/vscode-SpinalHDL/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
