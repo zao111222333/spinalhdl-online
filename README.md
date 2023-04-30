@@ -5,10 +5,6 @@ Github: <a href="https://github.com/zao111222333/spinalhdl-online" target="_blan
 
 Dockhub: <a href="https://hub.docker.com/r/zao111222333/spinalhdl-online" target="_blank">https://hub.docker.com/r/zao111222333/spinalhdl-online</a>
 
-Blog: <a href="https://junzhuo.me/Blogs/SpinalHDL-Online/" target="_blank">https://junzhuo.me/Blogs/SpinalHDL-Online/</a>
-
-Demo: <a href="https://spinalhdl-online.junzhuo.me/?folder=/SpinalHDL/SpinalTemplateSbt" target="_blank">https://spinalhdl-online.junzhuo.me</a> with `PASSWORD=123456` and `USER=username`.
-
 ![image](https://user-images.githubusercontent.com/57790433/153767207-a1ebb28a-8d51-4234-a199-7d41e50a954b.png)
 
 
