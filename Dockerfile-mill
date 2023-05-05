@@ -25,7 +25,7 @@ RUN cat /etc/apt/sources.list \
 #
 # jdk
 # https://www.oracle.com/java/technologies/downloads/#license-lightbox
-ENV JAVA_VERSION 321
+ENV JAVA_VERSION 361
 ENV JAVA_DIR     /usr/local/oracle-java-8
 ENV JAVA_HOME    ${JAVA_DIR}/jdk1.8.0_${JAVA_VERSION}
 COPY src/jdk/jdk-8u${JAVA_VERSION}-linux-x64.tar.gz /tmp/jdk-8u${JAVA_VERSION}-linux-x64.tar.gz
@@ -109,20 +109,20 @@ USER root
 #
 # code-server
 ENV PASSWORD 123456
-ENV CODE_VERSION  4.2.0
+ENV CODE_VERSION  4.12.0
 COPY src/code-server/code-server_${CODE_VERSION}_amd64.deb /tmp/code-server_${CODE_VERSION}_amd64.deb
 RUN cd /tmp && dpkg -i code-server_${CODE_VERSION}_amd64.deb
-COPY src/icon/vscode-SpinalHDL/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
-COPY src/icon/vscode-SpinalHDL/512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
-COPY src/icon/vscode-SpinalHDL/1024.png        /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
-COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
-COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
-COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
-COPY src/code-server/browser/media            /usr/lib/code-server/src/browser/media
-COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
-COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css
-RUN sed -i "s/Welcome to code-server/Welcome to SpinalHDL-Online/" /usr/lib/code-server/src/browser/pages/login.html \
- && sed -i "s/{{PASSWORD_MSG}}/{{PASSWORD_MSG}} <a href=\"https:\/\/github.com\/zao111222333\/spinalhdl-online\/\">more<\/a>/" /usr/lib/code-server/src/browser/pages/login.html
+#COPY src/icon/vscode-SpinalHDL/192.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-192.png
+#COPY src/icon/vscode-SpinalHDL/512.png         /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code-512.png
+#COPY src/icon/vscode-SpinalHDL/1024.png        /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/code.png
+#COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.ico /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.ico
+#COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon-dark-support.svg
+#COPY src/icon/vscode-SpinalHDL/vscode-SpinalHDL.svg /usr/lib/code-server/vendor/modules/code-oss-dev/resources/server/favicon.svg
+#COPY src/code-server/browser/media            /usr/lib/code-server/src/browser/media
+#COPY src/code-server/browser/pages/login.css  /usr/lib/code-server/src/browser/pages/login.css
+#COPY src/code-server/browser/pages/global.css /usr/lib/code-server/src/browser/pages/global.css
+#RUN sed -i "s/Welcome to code-server/Welcome to SpinalHDL-Online/" /usr/lib/code-server/src/browser/pages/login.html \
+# && sed -i "s/{{PASSWORD_MSG}}/{{PASSWORD_MSG}} <a href=\"https:\/\/github.com\/zao111222333\/spinalhdl-online\/\">more<\/a>/" /usr/lib/code-server/src/browser/pages/login.html
 COPY src/code-server/settings.json /home/${USER}/.local/share/code-server/User/settings.json
 COPY src/code-server/keybindings.json /home/${USER}/.local/share/code-server/User/keybindings.json
 RUN chown -R ${USER} ${WORKDIR}
