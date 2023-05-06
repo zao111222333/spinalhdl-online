@@ -5,16 +5,17 @@ Github: <a href="https://github.com/zao111222333/spinalhdl-online" target="_blan
 
 Dockhub: <a href="https://hub.docker.com/r/zao111222333/spinalhdl-online" target="_blank">https://hub.docker.com/r/zao111222333/spinalhdl-online</a>
 
-![image](https://user-images.githubusercontent.com/57790433/153767207-a1ebb28a-8d51-4234-a199-7d41e50a954b.png)
+<img width="1000" alt="image" src="https://user-images.githubusercontent.com/57790433/236583560-fc57a108-5b4b-41e2-8f5c-7536c821a826.png">
+<img width="1000" alt="image" src="https://user-images.githubusercontent.com/57790433/236583215-cd9d47a6-6e87-47a8-b8bf-13b73f245a69.png">
 
 
 Run these two lines in TERMINAL: 
 ```shell
 cd /SpinalHDL/SpinalTemplateSbt/
 # sbt  way
-sbt "runMain mylib.MyTopLevelSim"
+sbt "runMain projectname.MyTopLevelSim"
 # mill way
-mill mylib.runMain mylib.MyTopLevelSim
+mill projectname.runMain projectname.MyTopLevelSim
 ```
 And the output files (RTL, Waveform) will located at `SpinalTemplateSbt/simWorkspace/MyTopLevel`.
 
@@ -25,14 +26,14 @@ And the output files (RTL, Waveform) will located at `SpinalTemplateSbt/simWorks
 | Pakages | Version  | Description |
 |  ----  | ----  |  ----  |
 | [Debian](https://hub.docker.com/layers/debian/library/debian/10-slim/images/sha256-9f6e6f1f5a4665a552f46028808b28ab19788d28db470de6822febf710f47914?context=explore)  | 10-slim | Repositories: [mirrors.163.com/debian](http://mirrors.163.com/debian/) |
-| [SpinalHDL](https://github.com/SpinalHDL/SpinalHDL) | 1.6.1 |
-| [Java](https://www.oracle.com/java/technologies/downloads/#license-lightbox)   | jdk8u321 |
-| [Scala](https://www.scala-lang.org/download/2.11.12.html) | 2.11.12 |
+| [SpinalHDL](https://github.com/SpinalHDL/SpinalHDL) | 1.8.1 |
+| [Java](https://www.oracle.com/java/technologies/downloads/#license-lightbox)   | jdk8u361 |
+| [Scala](https://www.scala-lang.org/download/2.11.12.html) | 2.12.16 |
 | [Sbt](https://www.scala-sbt.org/download.html) / [Mill](https://github.com/com-lihaoyi/mill) | 1.4.7 / 0.9.8 | Repositories: [maven.aliyun.com](https://developer.aliyun.com/mvn/guide) |
-| [Verilator](https://www.veripool.org/verilator/) | 4.010 |
+| [Verilator](https://www.veripool.org/verilator/) | 4.038 |
 | [Gtkwave-Online](https://hub.docker.com/r/zao111222333/gtk3) | 0.1.0 | gtkwave3-gtk3 & gtk3-broadway & Nginx |
 | [OpenSSH](https://www.openssh.com/) | 7.9p1 |
-| [Code Server](https://github.com/cdr/code-server) | 4.0.2 |
+| [Code Server](https://github.com/cdr/code-server) | 4.10.0 |
 
 
 ***
