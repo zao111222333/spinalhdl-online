@@ -7,5 +7,5 @@
 #   -e PASS=123456 \
 #   -e WORKDIR=/SpinalHDL/ \
 #   -v /path/in/host/:/SpinalHDL/ \
-#   spinalhdl-online:sbt
-FROM zao111222333/spinalhdl-online:sbt-full
+#   spinalhdl-online
+FROM zao111222333/spinalhdl-online:mill-full
